@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Infosys.DBFirstCore.DataAccessLayer.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infosys.DBFirstCore.DataAccessLayer
@@ -11,6 +12,7 @@ namespace Infosys.DBFirstCore.DataAccessLayer
         public QuickKartRepository()
         {
             context = new QuickKartDbContext();
+
         }
 
         public List<Category> GetAllCategories()
@@ -201,6 +203,35 @@ namespace Infosys.DBFirstCore.DataAccessLayer
                 status = false;
             }
             return status;
+        }
+
+        public int AddCategoryDetailsUsingUSP(string categoryName, out byte categoryId)
+        {
+            categoryId = 0;
+            int result = 0;
+            int noOfRowsAffected = 0;
+
+            SqlParameter prmCategoryName = new SqlParameter("@CategoryName", categoryName);
+
+            SqlParameter prmCategoryId = new SqlParameter("@CategoryId", System.Data.SqlDbType.TinyInt);
+            prmCategoryId.Direction = System.Data.ParameterDirection.Output;
+
+            SqlParameter prmReturnValue = new SqlParameter("@ReturnValue", System.Data.SqlDbType.Int);
+            prmReturnValue.Direction = System.Data.ParameterDirection.Output;
+            try
+            {             
+                context.Database.ExecuteSqlRaw("EXEC {0} = usp_AddCategory {1}, {2} OUT", prmReturnValue, prmCategoryName, prmCategoryId);
+                result = Convert.ToInt32(prmReturnValue.Value);
+                categoryId = Convert.ToByte(prmCategoryId.Value);
+
+            }
+            catch (Exception)
+            {
+                categoryId = 0;
+                result = -99;
+                noOfRowsAffected = -1;
+            }
+            return result;
         }
     }
 }

@@ -174,6 +174,20 @@ namespace Infosys.DBFirstCore.ConsoleUI
             {
                 Console.WriteLine("Something went wrong, product has not been deleted");
             }
+
+            Console.WriteLine("\n------------------------------------------");
+            Console.WriteLine("Add Category details with Category ID");
+            Console.WriteLine("-------------------------------------------");
+            byte catId = 0;
+            int returnResult = repository.AddCategoryDetailsUsingUSP("Footwear", out catId);
+            if(returnResult > 0)
+            {
+                Console.WriteLine("Category details added successfully with CategoryId = " + catId);
+            }
+            else
+            {
+                Console.WriteLine("Something went wrong. Try again");
+            }
         }
     }
 }
